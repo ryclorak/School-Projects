@@ -1,0 +1,84 @@
+nop
+ldi d,0
+main:
+  dec d
+  ////n: 0			//should only be visible to subroutine, not caller
+  x: 0
+  ldi b,13		// any number
+  ldi a,n		  // a = n
+  add a,d
+  st (a),b		//n=13
+  st (d),a		//push n
+  dec d
+  ldi a,.5 +
+  st (d),a		//store return address
+  jmpi f
+  
+  ldi b,x		//setting x = return of f(n)
+  st (b),c
+  inc d
+  inc d
+  inc d
+  halt
+
+f:
+  dec d
+  r: 0
+  retAddr: r 1 +
+  n: retAddr 1 +
+				//don't need x anymore, don't need to know where it is
+
+  ldi a,n		//a reg has n
+  add a,d
+  ld a,(a)
+  
+if1:
+  ldi b,2		//b scratch reg
+  cmp b,a		//if 2<n, jump to else1
+  jci else1
+  ldi c,r		//if n<2, do this
+  add c,d
+  st (c),a
+  jmp end
+  
+else1:
+  dec d
+  n: 0
+  ldi a,n
+  dec a
+  add a,d
+  st (d),a
+  dec d
+  ldi a,.5 +
+  st (d),a
+  jmpi f
+  
+  ldi c,r
+  add c,a
+  inc d
+  
+				//second recursive call, r+= f(n-2)
+  dec d
+  n: 0
+  ldi a,n
+  dec a
+  add a,d
+  st (d),a
+  dec d
+  ldi a,.5 +
+  st (d),a
+  jmpi f
+  
+  ldi c,r
+  add c,a
+  inc d
+  
+
+end:
+  ldi a,r
+  add a,d
+  ld a,(d)
+  inc d
+  ld b,(d)
+  inc d
+  jmp b
