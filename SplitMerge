@@ -1,0 +1,125 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+
+using namespace std;
+
+struct Node
+{
+  string value;
+  Node* next;
+};
+
+void Add(Node*& head, string value);
+Node* ReadFile(string filename, Node* n);
+void Traverse(Node* curr);
+Node* Merge(Node* list1, Node* list2);
+void SplitAndMerge(Node* a);
+int Count(Node* b);
+
+
+int main()
+{
+  Node* n1 = new Node;
+  n1 = nullptr;
+  n1 = ReadFile("input.txt", n1);
+  cout << "read file into n1\n";
+  Traverse(n1);
+  cout << Count(n1) << " elements in list\n";
+
+  /*cout << "\nNew node, doubling n1:\n";
+  Node* n2 = new Node;
+  n2 = Merge(n1, n1);
+  Traverse(n2);
+*/
+  cout << "\nSplit and merge:\n";
+  SplitAndMerge(n1);
+
+  return 0;
+}
+
+
+void Add(Node*& head, string value)
+{
+  Node* nn = new Node;
+  nn->value = value;
+  nn->next = head;
+  head = nn;
+}
+
+Node* ReadFile(string filename, Node* n)
+{
+  cout << "Attempting to read file " << filename << "...\n";
+  string input = "";
+  ifstream inF;
+  inF.open(filename);
+  while (!inF.eof())
+  {
+    inF >> input;
+    Add(n, input);
+  }
+  cout << "Success!\n";
+  return n;
+}
+
+void Traverse(Node* curr)
+{
+  for (; curr; curr = curr->next)
+    cout << curr->value << endl;
+}
+
+Node* Merge(Node* list1, Node* list2)
+{
+  Node* merged = new Node;
+  merged = list1;
+
+  for (; list2; list2 = list2->next)
+    Add(merged, list2->value);
+
+  return merged;
+}
+
+void SplitAndMerge(Node* a)
+{
+  Node* myList1 = new Node;
+  myList1 = nullptr;
+  Node* myList2 = new Node;
+  myList2 = nullptr;
+
+  int c = Count(a)/2;
+  int cc= Count(a);
+
+  for (int i=0; i < c; i++)
+  {
+    Add(myList1, a->value);
+    a = a->next;
+  }
+
+  for (int j = c; j < cc; j++)
+  {
+    Add(myList2, a->value);
+    a = a->next;
+  }
+
+  cout << "Traversing 1:\n";
+  Traverse(myList1);
+  cout << "Traversing 2:\n";
+  Traverse(myList2);
+
+  cout << "Recombining:\n";
+
+  Node* recomb = new Node;
+  recomb = Merge(myList1, myList2);
+  Traverse(recomb);
+}
+
+int Count(Node* b)
+{
+  int counte = 0;
+  while (b)
+  {
+    counte++;
+    b = b->next;
+  }
+  return counte;
+}
